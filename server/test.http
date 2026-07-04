@@ -1,0 +1,17 @@
+POST http://localhost:8000/api/user/register
+Content-Type: application/json
+
+{
+    "name": "Rajesh",
+    "email": "rajesh@gmail.com",
+    "password": "123456",
+    "phone": "9876543210"
+}
+###
+POST http://localhost:8000/api/user/login
+Content-Type: application/json
+
+{
+  "email": "rajesh@gmail.com",
+  "password": "123456"
+}
