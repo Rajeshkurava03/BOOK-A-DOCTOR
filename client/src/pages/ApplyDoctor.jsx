@@ -1,16 +1,20 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
 function ApplyDoctor() {
-const [doctor, setDoctor] = useState({
-  fullName: "",
-  email: "",
-  phone: "",
-  address: "",
-  specialization: "",
-  experience: "",
-  fees: "",
-  timings: "",
-});
+  const navigate = useNavigate();
+
+  const [doctor, setDoctor] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    address: "",
+    specialization: "",
+    experience: "",
+    fees: "",
+    timings: "",
+  });
 
   const handleChange = (e) => {
     setDoctor({
@@ -19,51 +23,61 @@ const [doctor, setDoctor] = useState({
     });
   };
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  try {
-    const token = localStorage.getItem("token");
+    try {
+      const token = localStorage.getItem("token");
 
-    const doctorData = {
-      ...doctor,
-      timings: [doctor.timings],
-    };
+      const doctorData = {
+        ...doctor,
+        timings: [doctor.timings],
+      };
 
-    const res = await axios.post(
-      "http://localhost:8000/api/doctor/applyDoctor",
-      doctorData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const res = await axios.post(
+        "http://localhost:8000/api/doctor/applyDoctor",
+        doctorData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (res.data.success) {
+        alert(res.data.message);
+
+        // Redirect to User Home
+        navigate("/userhome");
+      } else {
+        alert(res.data.message);
       }
-    );
 
-    alert(res.data.message);
-  } catch (error) {
-  console.log(error);
-  console.log(error.response);
+    } catch (error) {
+      console.log(error);
+      console.log(error.response);
 
-  alert(
-    error.response?.data?.message ||
-    error.message ||
-    "Something went wrong"
-  );
-}
-};
+      alert(
+        error.response?.data?.message ||
+        error.message ||
+        "Something went wrong"
+      );
+    }
+  };
 
   return (
     <div>
       <h2>Apply for Doctor</h2>
 
       <form onSubmit={handleSubmit} style={{ maxWidth: "500px" }}>
+
         <input
           type="text"
           name="fullName"
           placeholder="Full Name"
           value={doctor.fullName}
           onChange={handleChange}
+          required
         />
         <br /><br />
 
@@ -73,6 +87,7 @@ const [doctor, setDoctor] = useState({
           placeholder="Email"
           value={doctor.email}
           onChange={handleChange}
+          required
         />
         <br /><br />
 
@@ -82,6 +97,7 @@ const [doctor, setDoctor] = useState({
           placeholder="Phone"
           value={doctor.phone}
           onChange={handleChange}
+          required
         />
         <br /><br />
 
@@ -91,6 +107,7 @@ const [doctor, setDoctor] = useState({
           placeholder="Address"
           value={doctor.address}
           onChange={handleChange}
+          required
         />
         <br /><br />
 
@@ -100,6 +117,7 @@ const [doctor, setDoctor] = useState({
           placeholder="Specialization"
           value={doctor.specialization}
           onChange={handleChange}
+          required
         />
         <br /><br />
 
@@ -109,6 +127,7 @@ const [doctor, setDoctor] = useState({
           placeholder="Experience"
           value={doctor.experience}
           onChange={handleChange}
+          required
         />
         <br /><br />
 
@@ -118,17 +137,24 @@ const [doctor, setDoctor] = useState({
           placeholder="Consultation Fees"
           value={doctor.fees}
           onChange={handleChange}
+          required
         />
-       <input
-  type="text"
-  name="timings"
-  placeholder="Timings (Ex: 09:00 AM - 05:00 PM)"
-  value={doctor.timings}
-  onChange={handleChange}
-/>
         <br /><br />
 
-        <button type="submit">Submit Application</button>
+        <input
+          type="text"
+          name="timings"
+          placeholder="Timings (Ex: 09:00 AM - 05:00 PM)"
+          value={doctor.timings}
+          onChange={handleChange}
+          required
+        />
+        <br /><br />
+
+        <button type="submit">
+          Submit Application
+        </button>
+
       </form>
     </div>
   );

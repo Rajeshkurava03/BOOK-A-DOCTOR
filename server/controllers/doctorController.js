@@ -15,10 +15,6 @@ const applyDoctorController = async (req, res) => {
     const admin = await userModel.findOne({ type: "admin" });
 
     if (admin) {
-      if (!admin.notification) {
-        admin.notification = [];
-      }
-
       admin.notification.push({
         type: "apply-doctor-request",
         message: `${req.body.fullName} has applied as a Doctor`,
@@ -35,7 +31,6 @@ const applyDoctorController = async (req, res) => {
       success: true,
       message: "Doctor application submitted successfully",
     });
-
   } catch (error) {
     console.log(error);
 
@@ -59,7 +54,6 @@ const getApprovedDoctorsController = async (req, res) => {
       success: true,
       data: doctors,
     });
-
   } catch (error) {
     console.log(error);
 
@@ -70,7 +64,40 @@ const getApprovedDoctorsController = async (req, res) => {
   }
 };
 
+// =======================
+// Get Logged-in User Doctor Application
+// =======================
+const getDoctorInfoController = async (req, res) => {
+  try {
+    const doctor = await doctorModel
+      .findOne({
+        userId: req.user.id,
+      })
+      .sort({ createdAt: -1 });
+
+    if (!doctor) {
+      return res.status(404).send({
+        success: false,
+        message: "No doctor application found",
+      });
+    }
+
+    return res.status(200).send({
+      success: true,
+      data: doctor,
+    });
+  } catch (error) {
+    console.log(error);
+
+    return res.status(500).send({
+      success: false,
+      message: "Error fetching doctor application",
+    });
+  }
+};
+
 module.exports = {
   applyDoctorController,
   getApprovedDoctorsController,
+  getDoctorInfoController,
 };

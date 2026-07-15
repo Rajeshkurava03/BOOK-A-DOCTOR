@@ -23,7 +23,6 @@ const bookAppointmentController = async (req, res) => {
       success: true,
       message: "Appointment Booked Successfully",
     });
-
   } catch (error) {
     console.log(error);
 
@@ -47,7 +46,6 @@ const getUserAppointmentsController = async (req, res) => {
       success: true,
       data: appointments,
     });
-
   } catch (error) {
     console.log(error);
 
@@ -63,9 +61,14 @@ const getUserAppointmentsController = async (req, res) => {
 // =============================
 const getDoctorAppointmentsController = async (req, res) => {
   try {
+    console.log("=================================");
+    console.log("Logged in User ID:", req.user.id);
+
     const doctor = await doctorModel.findOne({
       userId: req.user.id,
     });
+
+    console.log("Doctor Found:", doctor);
 
     if (!doctor) {
       return res.status(404).send({
@@ -78,11 +81,12 @@ const getDoctorAppointmentsController = async (req, res) => {
       doctorId: doctor._id,
     });
 
+    console.log("Appointments Found:", appointments);
+
     return res.status(200).send({
       success: true,
       data: appointments,
     });
-
   } catch (error) {
     console.log(error);
 
@@ -98,7 +102,9 @@ const getDoctorAppointmentsController = async (req, res) => {
 // =============================
 const updateAppointmentStatusController = async (req, res) => {
   try {
-    const appointment = await appointmentModel.findById(req.body.appointmentId);
+    const appointment = await appointmentModel.findById(
+      req.body.appointmentId
+    );
 
     if (!appointment) {
       return res.status(404).send({
@@ -108,13 +114,13 @@ const updateAppointmentStatusController = async (req, res) => {
     }
 
     appointment.status = req.body.status;
+
     await appointment.save();
 
     return res.status(200).send({
       success: true,
       message: "Appointment Updated Successfully",
     });
-
   } catch (error) {
     console.log(error);
 

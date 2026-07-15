@@ -9,6 +9,8 @@ import AdminHome from "./pages/AdminHome";
 import DoctorList from "./pages/DoctorList";
 import UserAppointments from "./pages/UserAppointments";
 import DoctorHome from "./pages/DoctorHome";
+import MyDoctorApplication from "./pages/MyDoctorApplication";
+
 function App() {
   return (
     <BrowserRouter>
@@ -38,6 +40,10 @@ function App() {
         <Route path="/doctors" element={<DoctorList />} />
         <Route path="/appointments" element={<UserAppointments />} />
         <Route path="/doctorhome" element={<DoctorHome />} />
+        <Route
+  path="/myDoctorApplication"
+  element={<MyDoctorApplication />}
+/>
       </Routes>
       
 

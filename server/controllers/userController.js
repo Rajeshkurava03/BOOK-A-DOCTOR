@@ -3,10 +3,12 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const appointmentModel = require("../schemas/appointmentModel");
 
-// Register Controller
+// ================= Register =================
 const registerController = async (req, res) => {
   try {
-    const existingUser = await userModel.findOne({ email: req.body.email });
+    const existingUser = await userModel.findOne({
+      email: req.body.email,
+    });
 
     if (existingUser) {
       return res.status(200).send({
@@ -16,18 +18,35 @@ const registerController = async (req, res) => {
     }
 
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(req.body.password, salt);
+    const hashedPassword = await bcrypt.hash(
+      req.body.password,
+      salt
+    );
 
-    req.body.password = hashedPassword;
-
-    const newUser = new userModel(req.body);
+    const newUser = new userModel({
+      name: req.body.name,
+      email: req.body.email,
+      phone: req.body.phone,
+      password: hashedPassword,
+    });
 
     await newUser.save();
 
+    // Generate JWT Token
+    const token = jwt.sign(
+      { id: newUser._id },
+      process.env.JWT_KEY,
+      {
+        expiresIn: "1d",
+      }
+    );
+
     return res.status(201).send({
       success: true,
-      message: "Register Success",
+      message: "Registration Successful",
+      token,
     });
+
   } catch (error) {
     console.log(error);
 
@@ -38,10 +57,12 @@ const registerController = async (req, res) => {
   }
 };
 
-// Login Controller
+// ================= Login =================
 const loginController = async (req, res) => {
   try {
-    const user = await userModel.findOne({ email: req.body.email });
+    const user = await userModel.findOne({
+      email: req.body.email,
+    });
 
     if (!user) {
       return res.status(200).send({
@@ -58,7 +79,7 @@ const loginController = async (req, res) => {
     if (!isMatch) {
       return res.status(200).send({
         success: false,
-        message: "Invalid email or password",
+        message: "Invalid Email or Password",
       });
     }
 
@@ -72,9 +93,10 @@ const loginController = async (req, res) => {
 
     return res.status(200).send({
       success: true,
-      message: "Login Success",
+      message: "Login Successful",
       token,
     });
+
   } catch (error) {
     console.log(error);
 
@@ -84,21 +106,15 @@ const loginController = async (req, res) => {
     });
   }
 };
-// Get User Data Controller
+
+// ================= Get User =================
 const getUserController = async (req, res) => {
   try {
     const user = await userModel.findById(req.body.userId);
 
-    if (!user) {
-      return res.status(404).send({
-        success: false,
-        message: "User not found",
-      });
-    }
-
     user.password = undefined;
 
-    res.status(200).send({
+    return res.status(200).send({
       success: true,
       data: user,
     });
@@ -106,12 +122,14 @@ const getUserController = async (req, res) => {
   } catch (error) {
     console.log(error);
 
-    res.status(500).send({
+    return res.status(500).send({
       success: false,
-      message: "Error while fetching user",
+      message: "Error fetching user",
     });
   }
 };
+
+// ================= User Appointments =================
 const getUserAppointmentsController = async (req, res) => {
   try {
     const appointments = await appointmentModel.find({
@@ -122,6 +140,7 @@ const getUserAppointmentsController = async (req, res) => {
       success: true,
       data: appointments,
     });
+
   } catch (error) {
     console.log(error);
 
@@ -131,6 +150,7 @@ const getUserAppointmentsController = async (req, res) => {
     });
   }
 };
+
 module.exports = {
   registerController,
   loginController,
